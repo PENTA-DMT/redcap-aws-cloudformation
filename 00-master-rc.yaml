@@ -384,6 +384,21 @@ Resources:
         a2cidr: !Ref a2cidr
         d1cidr: !Ref d1cidr
         d2cidr: !Ref d2cidr
+  route53:
+    Condition: DeployRoute53
+    DependsOn: redcapelasticbeanstalk
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        DnsEndpoint:
+          !Join ['', [!Ref EBEndpoint, '.', !Ref 'AWS::Region', '.elasticbeanstalk.com']]
+        HostedZoneId:
+          !Ref HostedZoneId
+        HostedZoneName:
+          !Ref HostedZoneName
+        DomainName:
+          !Ref DomainName
+      TemplateURL: https://s3.amazonaws.com/redcap-aws-cloudformation/03-rc-route53.yaml
   certificate:
     Condition: DeployACM
     Type: AWS::CloudFormation::Stack
@@ -468,21 +483,6 @@ Resources:
         TempEC2InstanceProfile:
           !GetAtt 'VPCStack.Outputs.TempEC2InstanceProfile'
       TemplateURL: https://s3.amazonaws.com/redcap-aws-cloudformation/02-rc-elasticbeanstalk.yaml
-  route53:
-    Condition: DeployRoute53
-    DependsOn: redcapelasticbeanstalk
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        DnsEndpoint:
-          !Join ['', [!Ref EBEndpoint, '.', !Ref 'AWS::Region', '.elasticbeanstalk.com']]
-        HostedZoneId:
-          !Ref HostedZoneId
-        HostedZoneName:
-          !Ref HostedZoneName
-        DomainName:
-          !Ref DomainName
-      TemplateURL: https://s3.amazonaws.com/redcap-aws-cloudformation/03-rc-route53.yaml
 
 Outputs:
   REDCapURL:
